@@ -7,7 +7,7 @@ clean:
 	rm -rf .pytest_cache build dist .coverage *.egg-info
 
 test:
-	pytest --flake8 --cov=now_and_later
+	pytest --flake8 --cov=now_and_later --cov-report term-missing
 
 test_pep257:
 	pep257 now_and_later/ tests/ -s
