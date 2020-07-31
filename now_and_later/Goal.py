@@ -41,10 +41,9 @@ class Goal:
         frequency_ = Duration(frequency)
         if frequency_.to_seconds() == 0:
             raise ValueError(
-                (
-                    "frequency '{}' is not able to be successfully parsed or "
-                    "must be a positive value"
-                ).format(frequency_.representation)
+                f"frequency '{frequency_.representation}'"
+                "is not able to be successfully parsed or "
+                "must be a positive value"
             )
         if state is self.State.NEW:
             if last_action:
