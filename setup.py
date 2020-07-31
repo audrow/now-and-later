@@ -32,6 +32,8 @@ setup(
         'todo list', 'priorities', 'productivity'
     ],
     install_requires=[
+        'durations',      # string parsing durations
+        'freezegun',      # spoof datetime
         'pytest',         # a testing framework
         'pytest-cov',     # checks the test coverage
         'pytest-flake8',  # check code style for pep-8
