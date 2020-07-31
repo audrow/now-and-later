@@ -24,7 +24,7 @@ jobs:
         pip install .
     - name: Test with pytest
       run: |
-        pytest --flake8 --cov=now_and_later --cov-report=xml term-missing
+        pytest --flake8 --cov=now_and_later --cov-report=xml
         pep257 now_and_later/ tests/ -s
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
