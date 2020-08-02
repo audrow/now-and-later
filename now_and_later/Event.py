@@ -66,3 +66,7 @@ class Event:
         if not self.is_ready():
             raise ValueError("Not ready to run")
         return self._callback()
+
+    def execute_callback(self):
+        """Run the callback directly."""
+        return self._callback()
