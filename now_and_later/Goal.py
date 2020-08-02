@@ -142,6 +142,8 @@ class Goal:
         if self._preempt_event is not None:
             self._preempt_event.set_next(
                 self._action_event.next - self._preempt_duration)
+        if self._snooze_event is not None:
+            self._snooze_event.set_next(None)
 
     def set_priority(self, value: float) -> None:
         """Set the priority of the goal."""
@@ -157,26 +159,48 @@ class Goal:
         """Get the name of the goal."""
         return self._name
 
+    @property
+    def next_preempt_action(self) -> Optional[datetime]:
+        """Get the datetime for the next preempt action."""
+        if self._preempt_event is None:
+            return None
+        return self._preempt_event.next
+
+    @property
+    def next_main_action(self) -> datetime:
+        """Get the datetime for the next main action."""
+        return self._action_event.next
+
+    @property
+    def next_snooze_action(self) -> Optional[datetime]:
+        """Get the datetime for the next snooze action."""
+        if self._snooze_event is None:
+            return None
+        return self._snooze_event.next
+
     def _reset_priority(self) -> None:
         logging.info(f'Priority reset to {self._default_priority}')
         self._priority = self._default_priority
 
     def _is_preempt_ready(self) -> bool:
-        if self._preempt_event is None:
+        if self._preempt_event is None or self.state == 'active':
             return False
         return self._preempt_event.is_ready()
 
     def _is_main_action_ready(self) -> bool:
+        if self.state == 'active':
+            return False
         return self._action_event.is_ready()
 
     def _is_snooze_ready(self) -> bool:
-        if self._snooze_event is None:
+        if self._snooze_event is None or self.state != 'active':
             return False
         return self._snooze_event.is_ready()
 
     def _preempt_action(self) -> None:
         self._preempt_event.run()
         self._preempt_event.set_last(datetime.now())
+        self._preempt_event.set_next(None)
 
     def _main_action(self) -> None:
         if self._snooze_event is not None:
@@ -184,6 +208,7 @@ class Goal:
 
         self._action_event.run()
         self._action_event.set_last(datetime.now())
+        self._action_event.set_next(None)
 
     def _snooze_action(self) -> None:
         self._snooze_event.run()

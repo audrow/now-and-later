@@ -51,7 +51,7 @@ class Event:
         """Set the datetime for the last run."""
         self._last = value
 
-    def set_next(self, value: datetime) -> None:
+    def set_next(self, value: Optional[datetime]) -> None:
         """Set the datetime when run should be available after."""
         self._next = value
 
