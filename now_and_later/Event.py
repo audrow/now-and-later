@@ -1,5 +1,6 @@
 """Keep track of when a function is called and should be called next."""
 from datetime import datetime
+import logging
 from typing import Any, Callable, Optional
 
 
@@ -29,7 +30,7 @@ class Event:
         self._callback = callback
 
     def _default_callback(self):
-        print(f"Running event in '{self.name}'")
+        logging.info(f"Running callback in '{self.name}' event")
 
     @property
     def name(self):
@@ -64,4 +65,8 @@ class Event:
         """Run the callback function if it is ready."""
         if not self.is_ready():
             raise ValueError("Not ready to run")
+        return self._callback()
+
+    def execute_callback(self):
+        """Run the callback directly."""
         return self._callback()

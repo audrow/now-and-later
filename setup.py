@@ -40,6 +40,7 @@ setup(
         'pytest-mock',    # for mocks
         'pep257',         # check the code is well documented
         'schedule',       # job scheduling
+        'transitions',    # for finite state machine
     ],
     classifiers=[
         'Intended Audience :: Developers',
