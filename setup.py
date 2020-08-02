@@ -37,6 +37,7 @@ setup(
         'pytest',         # a testing framework
         'pytest-cov',     # checks the test coverage
         'pytest-flake8',  # check code style for pep-8
+        'pytest-mock',    # for mocks
         'pep257',         # check the code is well documented
         'schedule',       # job scheduling
     ],
