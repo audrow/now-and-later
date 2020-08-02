@@ -43,6 +43,8 @@ def test_bad_transitions():
         duration=timedelta(seconds=0),
         priority=1.0
     )
+    assert goal.next_preempt_action is None
+    assert goal.next_snooze_action is None
     assert goal.state == States.NEW
     for _ in range(10):
         with pytest.raises(MachineError):
@@ -97,10 +99,9 @@ def test_transition_callbacks(mocker: pytest_mock.MockFixture):
     )
     assert goal.state == States.NEW
     assert not mock_preempt_fn.called
-    for i in range(5):
-        goal.preempt()
-        assert mock_preempt_fn.call_count == i + 1
-        assert goal.state == States.IDLE
+    goal.preempt()
+    assert mock_preempt_fn.called
+    assert goal.state == States.IDLE
 
     assert not mock_action_fn.called
     goal.act()
@@ -129,8 +130,11 @@ def test_skip_transition_callbacks():
     )
     assert not goal._is_preempt_ready()
     goal.preempt()
+
     assert goal._is_main_action_ready()
     goal.act()
+    assert not goal._is_main_action_ready()
+
     assert not goal._is_snooze_ready()
     goal.snooze()
 
@@ -147,34 +151,38 @@ def test_main_action_scheduling():
         assert not goal._is_preempt_ready()
         assert not goal._is_main_action_ready()
 
-    assert goal._action_event.next == datetime(2020, 1, 11)
-    assert goal._preempt_event.next == datetime(2020, 1, 9)
+    assert goal.next_main_action == datetime(2020, 1, 11)
+    assert goal.next_preempt_action == datetime(2020, 1, 9)
 
     with freeze_time(datetime(2020, 1, 10)):
         assert goal._is_preempt_ready()
         goal.preempt()
         assert goal._preempt_event.last == datetime(2020, 1, 10)
+        assert goal.next_preempt_action is None
 
     with freeze_time(datetime(2020, 1, 12)):
         assert goal._is_main_action_ready()
         goal.act()
     assert goal._action_event.last == datetime(2020, 1, 12)
-    assert goal._snooze_event.next == datetime(2020, 1, 15)
+    assert goal.next_main_action is None
+    assert goal.next_snooze_action == datetime(2020, 1, 15)
 
     with freeze_time(datetime(2020, 1, 16)):
         assert goal._is_snooze_ready()
         goal.snooze()
     assert goal._snooze_event.last == datetime(2020, 1, 16)
-    assert goal._snooze_event.next == datetime(2020, 1, 19)
+    assert goal.next_snooze_action == datetime(2020, 1, 19)
 
     with freeze_time(datetime(2020, 1, 20)):
         goal.complete()
 
     assert goal._preempt_event.last == datetime(2020, 1, 10)
-    assert goal._preempt_event.next == datetime(2020, 1, 28)
+    assert goal.next_preempt_action == datetime(2020, 1, 28)
 
     assert goal._action_event.last == datetime(2020, 1, 12)
-    assert goal._action_event.next == datetime(2020, 1, 30)
+    assert goal.next_main_action == datetime(2020, 1, 30)
+
+    assert goal.next_snooze_action is None
 
     assert goal._completion_event.last == datetime(2020, 1, 20)
     assert goal._completion_event.next is None
