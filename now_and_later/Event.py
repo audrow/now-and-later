@@ -1,5 +1,6 @@
 """Keep track of when a function is called and should be called next."""
 from datetime import datetime
+import logging
 from typing import Any, Callable, Optional
 
 
@@ -29,7 +30,7 @@ class Event:
         self._callback = callback
 
     def _default_callback(self):
-        print(f"Running event in '{self.name}'")
+        logging.info(f"Running callback in '{self.name}' event")
 
     @property
     def name(self):

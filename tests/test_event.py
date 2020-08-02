@@ -73,7 +73,7 @@ def test_default_callback(mocker: pytest_mock.MockFixture):
     with freeze_time(datetime(2020, 1, 1)):
         event = Event('name', next_=datetime.now())
     with freeze_time(datetime(2020, 1, 2)):
-        print_ = mocker.patch('now_and_later.Event.print')
-        assert not print_.called
+        log_info = mocker.patch('now_and_later.Event.logging.info')
+        assert not log_info.called
         event.run()
-        assert print_.called
+        assert log_info.called
